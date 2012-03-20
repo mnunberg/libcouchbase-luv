@@ -1,0 +1,8 @@
+This is still a WIP.
+
+To compile you will need to have libcouchbase and libuv headers
+available. Look in the Makefile and edit the paths as needed.
+
+For the logging, you should also have curses (weird, but i need
+the output currently)
+
