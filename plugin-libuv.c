@@ -26,6 +26,19 @@ invoke_stop_callback(struct libcouchbase_io_opt_st *iops)
     invoke_startstop_callback(IOPS_COOKIE(iops), IOPS_COOKIE(iops)->stop_callback);
 }
 
+static void sync_loop_run(struct libcouchbase_io_opt_st *iops)
+{
+    IOPS_COOKIE(iops)->do_stop = 0;
+    while (IOPS_COOKIE(iops)->do_stop == 0) {
+        uv_run_once(IOPS_COOKIE(iops)->loop);
+    }
+}
+
+static void sync_loop_stop(struct libcouchbase_io_opt_st *iops)
+{
+    IOPS_COOKIE(iops)->do_stop = 1;
+}
+
 struct libcouchbase_io_opt_st *
 lcb_luv_create_io_opts(uv_loop_t *loop, uint16_t sock_max)
 {
@@ -64,6 +77,7 @@ lcb_luv_create_io_opts(uv_loop_t *loop, uint16_t sock_max)
     ret->create_timer = lcb_luv_create_timer;
     ret->delete_timer = lcb_luv_delete_timer;
     ret->update_timer = lcb_luv_update_timer;
+    ret->destroy_timer = lcb_luv_destroy_timer;
 
     /* noops */
     ret->run_event_loop = invoke_start_callback;
@@ -71,5 +85,15 @@ lcb_luv_create_io_opts(uv_loop_t *loop, uint16_t sock_max)
 
     ret->destructor = lcb_luv_noop;
 
+    return ret;
+}
+
+struct libcouchbase_io_opt_st *
+libcouchbase__TestLoop(void)
+{
+    uv_loop_t *loop = uv_default_loop();
+    struct libcouchbase_io_opt_st *ret = lcb_luv_create_io_opts(loop, 1024);
+    ret->run_event_loop = sync_loop_run;
+    ret->stop_event_loop = sync_loop_stop;
     return ret;
 }

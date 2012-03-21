@@ -38,6 +38,8 @@ struct lcb_luv_cookie_st {
     uint16_t fd_next;
     uint16_t fd_max;
 
+    int do_stop;
+
     /* public */
     void *data;
     lcb_luv_start_cb_t start_callback;
@@ -78,7 +80,7 @@ struct lcb_luv_evstate_st {
 };
 
 /**
- * Structure representing a TCP network connection
+ * Structure representing a TCP network connection.
  */
 struct lcb_luv_socket_st {
     /* Should be first */
@@ -88,12 +90,14 @@ struct lcb_luv_socket_st {
     union uv_any_req u_req;
 
     /* Index into the 'fd' table */
-    uint16_t idx;
+    long idx;
 
     int eof;
 
     uv_prepare_t prep;
     int prep_active;
+
+    unsigned long refcount;
 
     struct {
         /* Readahead buffer*/
@@ -111,6 +115,8 @@ struct lcb_luv_socket_st {
         size_t pos;
         size_t nb;
     } write;
+
+
 
     /* various information on different operations */
     struct lcb_luv_evstate_st evstate[LCB_LUV_EV_MAX];

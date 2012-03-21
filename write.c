@@ -31,6 +31,7 @@ write_cb(uv_write_t *req, int status)
         sock->event->lcb_cb(sock->idx, LIBCOUCHBASE_WRITE_EVENT,
                 sock->event->lcb_arg);
     }
+    lcb_luv_socket_unref(sock);
 }
 
 
@@ -58,6 +59,8 @@ lcb_luv_flush(lcb_luv_socket_t sock)
     status = uv_write(&sock->u_req.write,
                         (uv_stream_t*)&sock->tcp,
                         &sock->write.buf, 1, write_cb);
+    lcb_luv_socket_ref(sock);
+
     yolog_warn("%d: Requested to flush %d bytes", sock->idx, sock->write.buf.len);
 
     if (status) {

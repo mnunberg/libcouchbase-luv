@@ -2,3 +2,4 @@
 *.so
 test-main
 *.swp
+uv/*

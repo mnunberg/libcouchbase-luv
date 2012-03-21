@@ -1,28 +1,71 @@
+# Beginning of tunables
+#
+# Location of libcouchbase source tree (should already be built)
+LIBCOUCHBASE_SRC=/sources/libcouchbase
+#
+# Directory where libcouchbase.so is found
+LIBCOUCHBASE_LIBDIR=$(LIBCOUCHBASE_SRC)/.libs
+#
+# location of libcouchbase headers ( <libcouchbase/couchbase.h> )
+LIBCOUCHBASE_INCLUDE=$(LIBCOUCHBASE_SRC)/include
+#
+#
+# path to a CLEAN source tree of libuv
+LIBUV_SRC=$(shell pwd)/uv
+#
+# debug/optimization/warnings
+COMPILE_FLAGS=-O0 -ggdb3 -Wall
+#
+# libraries which libuv.so itself requires
+LIBUV_LIBS=-ldl -lpthread -lrt -lm
+#
+# End of tunables
+# Here be dragons
+
+LIBUV_SO=libuv.so
+LIBUV_INCLUDE=$(LIBUV_SRC)/include
+LIBUV_A=$(LIBUV_SRC)/uv.a
+
+
+INCLUDE_FLAGS=-I$(LIBUV_INCLUDE) -I$(LIBCOUCHBASE_INCLUDE) -I$(shell pwd)
+
+CFLAGS=$(COMPILE_FLAGS) $(INCLUDE_FLAGS)
+
+LDFLAGS=-L$(LIBCOUCHBASE_LIBDIR) -L. \
+		-Wl,-rpath=$(LIBCOUCHBASE_LIBDIR) \
+		-Wl,-rpath=$(shell pwd)
+
+LIBS_EXTRA=-lcurses -lcouchbase -luv
+
+OBJECTS=read.o write.o socket.o common.o plugin-libuv.o timer.o yolog.o
+
 all: libcouchbase_libuv.so
 
 check: test-main
 	./test-main
 
-LIBCOUCHBASE_DIR=/sources/libcouchbase/.libs
-LIBCOUCHBASE_INCLUDE=/sources/libcouchbase/include
-LIBUV_INCLUDE=/sources/libuv/include
-LIBUV_A=/sources/libuv/uv.a
-
-CFLAGS=-O0 -ggdb3 -Wall -I$(LIBUV_INCLUDE) -I$(LIBCOUCHBASE_INCLUDE) -I$(shell pwd)
-
-LDFLAGS=-L$(LIBCOUCHBASE_DIR) \
-		-Wl,-rpath=$(LIBCOUCHBASE_DIR) \
-		-Wl,-rpath=$(shell pwd) \
-		-lcouchbase -lcurses
-
-OBJECTS=read.o write.o socket.o common.o plugin-libuv.o timer.o yolog.o
+check-lcb: libcouchbase_libuv.so
+	./run_lcb_tests.sh \
+		$(LIBCOUCHBASE_SRC) \
+		$(LIBCOUCHBASE_LIBDIR) \
+		$(LCB_TEST_NAME)
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) -fPIC -fpic -o $@ $^
+	$(CC) -c $(CFLAGS) -fpic -o $@ $^
 
+$(LIBUV_A):
+	$(MAKE) -C uv/ CFLAGS+="$(COMPILE_FLAGS) -fPIC"
+	ranlib $@
 
-libcouchbase_libuv.so: $(OBJECTS)
-	$(CC) -shared -o $@ $(OBJECTS) $(LDFLAGS) $(LIBUV_A)
+$(LIBUV_SO): $(LIBUV_A)
+	$(CC) -shared -o $@ -fPIC $(LDFLAGS) \
+		-Wl,--start-group \
+			-Wl,-E -Wl,--whole-archive $^ -Wl,--no-whole-archive \
+		-Wl,--end-group \
+		$(LIBUV_LIBS)
+
+libcouchbase_libuv.so: $(OBJECTS) $(LIBUV_SO)
+	$(CC) -shared -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS_EXTRA) $(LIBUV_SO)
 
 test-main: test/test.c test/simple_1.c libcouchbase_libuv.so
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $^

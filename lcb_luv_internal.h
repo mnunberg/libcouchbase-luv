@@ -105,6 +105,35 @@ lcb_luv_destroy_timer(struct libcouchbase_io_opt_st *iops,
  * These are functions private to lcb-luv. They are not iops functions
  */
 
+/**
+ * This will allocate a new 'socket'. Returns the new socket, or NULL on error
+ */
+lcb_luv_socket_t
+lcb_luv_socket_new(struct libcouchbase_io_opt_st *iops);
+
+/**
+ * This deinitializes a socket.
+ * The reference count of the new socket is 1
+ */
+void
+lcb_luv_socket_deinit(lcb_luv_socket_t sock);
+
+/**
+ * This will decrement the reference count and free the socket if the reference
+ * count is 0.
+ * The return value is the reference count. If the return is 0, then it means
+ * the socket is freed and does not point to valid data.
+ */
+unsigned long
+lcb_luv_socket_unref(lcb_luv_socket_t sock);
+
+#define lcb_luv_socket_ref(sock) sock->refcount++
+
+/**
+ * Frees the socket
+ */
+void
+lcb_luv_socket_free(lcb_luv_socket_t sock);
 
 /**
  * This will get a socket structure from an index
@@ -117,6 +146,12 @@ lcb_luv_sock_from_idx(struct libcouchbase_io_opt_st *iops, libcouchbase_socket_t
  */
 void
 lcb_luv_read_nudge(lcb_luv_socket_t sock);
+
+/**
+ * Will stop whatever read_nudge started. It will stop trying to readahead
+ */
+void
+lcb_luv_read_stop(lcb_luv_socket_t sock);
 
 /**
  * Will enable our per-iteration callback, unless already enabled
