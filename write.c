@@ -13,24 +13,33 @@ static void
 write_cb(uv_write_t *req, int status)
 {
     lcb_luv_socket_t sock = (lcb_luv_socket_t)req->data;
+    struct lcb_luv_evstate_st *evstate;
+
     if (!sock) {
         fprintf(stderr, "Got write callback (req=%p) without socket\n", req);
         return;
     }
-    if (status) {
-        sock->evstate[LCB_LUV_EV_WRITE].err =
-                (uv_last_error(sock->parent->loop)).code;
-    }
 
-    yolog_err("Wrote all our data: status=%d", status);
+    evstate = EVSTATE_FIND(sock, WRITE);
+
+    if (status) {
+        evstate->err = (uv_last_error(sock->parent->loop)).code;
+    }
+    yolog_debug("Flush done. Flushed %d bytes", sock->write.buf.len);
     sock->write.pos = 0;
     sock->write.nb = 0;
-    sock->evstate[LCB_LUV_EV_WRITE].flags |= LCB_LUV_EVf_PENDING;
-    sock->evstate[LCB_LUV_EV_WRITE].flags &= ~(LCB_LUV_EVf_FLUSHING);
-    if (sock->event->lcb_events & LIBCOUCHBASE_WRITE_EVENT) {
-        sock->event->lcb_cb(sock->idx, LIBCOUCHBASE_WRITE_EVENT,
-                sock->event->lcb_arg);
+    evstate->flags |= LCB_LUV_EVf_PENDING;
+    evstate->flags &= ~(LCB_LUV_EVf_FLUSHING);
+
+    if (SOCK_EV_ENABLED(sock, WRITE)) {
+        sock->event->lcb_cb(sock->idx, LIBCOUCHBASE_WRITE_EVENT, sock->event->lcb_arg);
+
+        if (sock->write.nb) {
+            evstate->flags &= ~(LCB_LUV_EVf_PENDING);
+            lcb_luv_flush(sock);
+        }
     }
+
     lcb_luv_socket_unref(sock);
 }
 
@@ -42,32 +51,29 @@ void
 lcb_luv_flush(lcb_luv_socket_t sock)
 {
     int status;
-
+    struct lcb_luv_evstate_st *evstate;
     if (sock->write.nb == 0) {
-        yolog_warn("%d: Nothing to flush..", sock->idx);
         return;
     }
 
-    if (sock->evstate[LCB_LUV_EV_WRITE].flags & LCB_LUV_EVf_FLUSHING) {
+    evstate = EVSTATE_FIND(sock, WRITE);
+    if(EVSTATE_IS(evstate, FLUSHING)) {
         yolog_warn("Not flushing because we are in the middle of a flush");
         return;
     }
 
     sock->write.buf.base = sock->write.data;
     sock->write.buf.len = sock->write.nb;
-
+    yolog_debug("Will flush");
     status = uv_write(&sock->u_req.write,
                         (uv_stream_t*)&sock->tcp,
                         &sock->write.buf, 1, write_cb);
     lcb_luv_socket_ref(sock);
 
-    yolog_warn("%d: Requested to flush %d bytes", sock->idx, sock->write.buf.len);
-
     if (status) {
-        sock->evstate[LCB_LUV_EV_WRITE].err =
-                (uv_last_error(sock->parent->loop)).code;
+        evstate->err = (uv_last_error(sock->parent->loop)).code;
     }
-    sock->evstate[LCB_LUV_EV_WRITE].flags |= LCB_LUV_EVf_FLUSHING;
+    evstate->flags |= LCB_LUV_EVf_FLUSHING;
 }
 
 
@@ -75,30 +81,37 @@ static libcouchbase_ssize_t
 write_common(lcb_luv_socket_t sock, const void *buf, size_t len, int *errno_out)
 {
     libcouchbase_ssize_t ret;
-    struct lcb_luv_evstate_st *evstate = sock->evstate + LCB_LUV_EV_WRITE;
-    yolog_warn("%d: Requested to write %d bytes from %p", sock->idx, len, buf);
+    struct lcb_luv_evstate_st *evstate = EVSTATE_FIND(sock, WRITE);
+
+    yolog_debug("%d: Requested to write %d bytes from %p", sock->idx, len, buf);
 
     if (evstate->err) {
+        yolog_warn("Socket has pending error %d", evstate->err);
         *errno_out = evstate->err;
         evstate->err = 0;
         return -1;
     }
 
-    if (evstate->flags & LCB_LUV_EVf_FLUSHING) {
+    if (EVSTATE_IS(evstate, FLUSHING)) {
+        yolog_warn("Will not write because we are inside a flush");
         *errno_out = EWOULDBLOCK;
         return -1;
     }
 
     ret = MINIMUM(len, sizeof(sock->write.data) - sock->write.nb);
     if (ret == 0) {
+        yolog_warn("We have no more space inside the buffer");
         *errno_out = EWOULDBLOCK;
         return -1;
     }
 
+
+
     memcpy(sock->write.data + sock->write.pos, buf, ret);
+//    lcb_luv_hexdump(sock->write.data + sock->write.pos, ret);
     sock->write.pos += ret;
     sock->write.nb += ret;
-    yolog_warn("Returning successfuly (nb=%d)", sock->write.nb);
+    yolog_debug("Returning %d", ret);
     return ret;
 }
 

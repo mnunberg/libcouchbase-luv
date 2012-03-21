@@ -36,13 +36,22 @@ LDFLAGS=-L$(LIBCOUCHBASE_LIBDIR) -L. \
 		-Wl,-rpath=$(shell pwd)
 
 LIBS_EXTRA=-lcurses -lcouchbase -luv
+UTIL_OBJ= util/hexdump.o util/yolog.o
 
-OBJECTS=read.o write.o socket.o common.o plugin-libuv.o timer.o yolog.o
+OBJECTS=read.o write.o socket.o common.o plugin-libuv.o timer.o $(UTIL_OBJ)
 
 all: libcouchbase_libuv.so
 
+depend: .depend
+
+.depend: $(wildcard *.c)
+	rm -rf $@
+	$(CC) $(CFLAGS) -MM $^ >> $@
+
+include .depend
+
 check: test-main
-	./test-main
+	LCB_LUV_DEBUG=1 ./test-main
 
 check-lcb: libcouchbase_libuv.so
 	./run_lcb_tests.sh \
@@ -51,7 +60,7 @@ check-lcb: libcouchbase_libuv.so
 		$(LCB_TEST_NAME)
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) -fpic -o $@ $^
+	$(CC) -c $(CFLAGS) -fpic -o $@ $<
 
 $(LIBUV_A):
 	$(MAKE) -C uv/ CFLAGS+="$(COMPILE_FLAGS) -fPIC"
@@ -71,4 +80,7 @@ test-main: test/test.c test/simple_1.c libcouchbase_libuv.so
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $^
 
 clean:
-	rm -f $(OBJECTS) *.o *.so test-main
+	rm -f $(OBJECTS) *.o *.so test-main .depend
+
+clean-all: clean
+	$(MAKE) -C $(LIBUV_SRC) clean

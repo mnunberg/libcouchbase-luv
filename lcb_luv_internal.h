@@ -7,16 +7,120 @@
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
-#include "yolog.h"
+#include "util/yolog.h"
 
 #define EVSTATE_IS(p, b) \
     ( ( (p)->flags ) & LCB_LUV_EVf_ ## b)
+
+#define EVSTATE_FIND(sock, evtype) \
+    (sock->evstate + LCB_LUV_EV_ ## evtype)
+
+#define SOCK_EV_ENABLED(sock, evtype) \
+    (sock->event && (sock->event->lcb_events & LIBCOUCHBASE_ ## evtype ## _EVENT))
 
 #define IOPS_COOKIE(iops) \
     ((struct lcb_luv_cookie_st*)(iops->cookie))
 
 #define MINIMUM(a,b) \
     ((a < b) ? a : b)
+
+/**
+ * Fields representing various events
+ */
+enum {
+    LCB_LUV_EV_READ = 0,
+    LCB_LUV_EV_WRITE = 1,
+
+    LCB_LUV_EV_RDWR_MAX = 2,
+
+    LCB_LUV_EV_CONNECT = 2,
+    LCB_LUV_EV_MAX
+};
+
+
+/**
+ * Structure representing an event
+ */
+struct lcb_luv_event_st {
+    /* socket */
+    lcb_luv_socket_t handle;
+
+    /* libcouchbase function to be invoked */
+    lcb_luv_callback_t lcb_cb;
+    /* argument to pass to callback */
+    void *lcb_arg;
+
+    /* which events to monitor */
+    short lcb_events;
+};
+
+typedef enum {
+    LCB_LUV_EVf_CONNECTED = 1 << 0,
+    LCB_LUV_EVf_ACTIVE = 1 << 1,
+
+    LCB_LUV_EVf_PENDING = 1 << 2,
+    LCB_LUV_EVf_FLUSHING = 1 << 3,
+} lcb_luv_evstate_flags_t;
+
+
+
+
+struct lcb_luv_evstate_st {
+    lcb_luv_evstate_flags_t flags;
+    /* Recorded errno */
+    int err;
+};
+
+/**
+ * Structure representing a TCP network connection.
+ */
+struct lcb_luv_socket_st {
+    /* Should be first */
+    uv_tcp_t tcp;
+
+    /* Union for our requests */
+    union uv_any_req u_req;
+
+    /* Index into the 'fd' table */
+    long idx;
+
+    int eof;
+
+    uv_prepare_t prep;
+    int prep_active;
+
+    unsigned long refcount;
+
+    struct {
+        /* Readahead buffer*/
+        uv_buf_t buf;
+        char data[LCB_LUV_READAHEAD];
+        size_t pos;
+        size_t nb;
+        int readhead_active;
+    } read;
+
+    struct {
+        uv_buf_t buf;
+        /* how much data does our buffer have */
+        char data[LCB_LUV_WRITEBUFSZ];
+        size_t pos;
+        size_t nb;
+    } write;
+
+
+
+    /* various information on different operations */
+    struct lcb_luv_evstate_st evstate[LCB_LUV_EV_MAX];
+
+    /* Pointer to libcouchbase opaque event, if any */
+    struct lcb_luv_event_st *event;
+
+    /* Pointer to our cookie */
+    struct lcb_luv_cookie_st *parent;
+};
+
+
 
 void *
 lcb_luv_create_event(struct libcouchbase_io_opt_st *iops);
@@ -164,5 +268,8 @@ lcb_luv_schedule_enable(lcb_luv_socket_t sock);
  */
 void
 lcb_luv_flush(lcb_luv_socket_t sock);
+
+void
+lcb_luv_hexdump(void* data, int size);
 
 #endif /* LCB_LUV_INTERNAL_H_ */

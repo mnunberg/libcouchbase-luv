@@ -34,10 +34,15 @@ static yobot_log_s loggerparams_internal = {
 };
 
 static char *title_fmt = "", *reset_fmt = "";
+static int LoggingEnabled = 0;
 
 #ifdef HAVE_CURSES
 static int use_escapes = -1;
 static void _init_color_logging(void) {
+    char *tmp = getenv("LCB_LUV_DEBUG");
+    if (tmp && *tmp) {
+        LoggingEnabled = 1;
+    }
 	if (use_escapes < 0) {
 		if (!isatty(STDOUT_FILENO)) {
 			use_escapes = 0;
@@ -110,17 +115,19 @@ void yobot_logger(yobot_log_s logparams, yobot_log_level level, int line,
 			break;
 		}
 	}
-	flockfile(stdout);
-	printf("[%s%s%s] ", title_fmt, logparams.prefix, reset_fmt);
-#ifdef YOLOG_TIME
-	printf(" %f ", (float)clock()/CLOCKS_PER_SEC);
-#endif
-	printf("%s", line_fmt);
-	printf("%s:%d ", fn, line);
-	vprintf(fmt, ap);
-	printf("%s", reset_fmt);
-	printf("\n");
-	fflush(NULL);
-	funlockfile(stdout);
+	if (LoggingEnabled) {
+        flockfile(stdout);
+        printf("[%s%s%s] ", title_fmt, logparams.prefix, reset_fmt);
+    #ifdef YOLOG_TIME
+        printf(" %f ", (float)clock()/CLOCKS_PER_SEC);
+    #endif
+        printf("%s", line_fmt);
+        printf("%s:%d ", fn, line);
+        vprintf(fmt, ap);
+        printf("%s", reset_fmt);
+        printf("\n");
+        fflush(NULL);
+        funlockfile(stdout);
+	}
 	va_end(ap);
 }

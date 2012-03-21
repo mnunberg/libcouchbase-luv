@@ -383,18 +383,33 @@ and the plugin, libcouchbase-libuv.so
 
 To run basic async mode tests, you can do C<make check>.
 
-If it terminates something like:
-
+This is an example of a successful invocation (mind the exit error).
+    $ make check
+    # ...
     [simple1] get_callback:30 Get callback successful
     [common] lcb_luv_update_event:246 Requested events 2
     [test] stop_callback:15 stop_event_loop(). Will invoke next state
     [simple1] t00_contcb_next:68 Exiting now..
     make: *** [check] Error 1
 
-then you are in the clear. Anything else is an error.
 
 To run libcouchbase with the libuv event loop, run C<make check-lcb>.
 
-There will be lots of output, but hopefully none of the tests should fail.
+   $ make check-lcb
+
+   # lots of output here.
+   # ..
+   ===================
+   All 14 tests passed
+   ===================
+
+To run a specific test from within the libcouchbase test suite, you can set
+the C<LCB_TEST_NAME> Make variable, as so:
+
+    $ make check-lcb LCB_TEST_NAME=arithmetic-test
+    Will try to use loop: libuv
+    # successful termination.
 
 
+
+To get more verbose output, set C<LCB_LUV_DEBUG> in the environment.

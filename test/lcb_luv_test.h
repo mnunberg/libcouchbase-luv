@@ -2,7 +2,7 @@
 #define LCB_LUV_TEST_H_
 
 #include "libcouchbase-libuv.h"
-#include "../yolog.h"
+#include "../util/yolog.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

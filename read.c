@@ -1,5 +1,5 @@
 #include "lcb_luv_internal.h"
-YOLOG_STATIC_INIT("read", YOLOG_DEBUG);
+YOLOG_STATIC_INIT("read", YOLOG_WARN);
 
 uv_buf_t
 alloc_cb(uv_handle_t *handle, size_t suggested_size)
@@ -15,6 +15,7 @@ read_cb(uv_stream_t *stream, ssize_t nread, uv_buf_t buf)
     lcb_luv_socket_t sock = (lcb_luv_socket_t)stream;
     int is_stopped = 0;
     lcb_luv_socket_ref(sock);
+    yolog_debug("%d: nr=%d, len=%d", sock->idx, nread, buf.len);
 
     if (nread == -1) {
         uv_err_t last_err = uv_last_error(sock->parent->loop);
@@ -56,6 +57,7 @@ lcb_luv_read_nudge(lcb_luv_socket_t sock)
 {
     int status;
     if (sock->read.readhead_active) {
+        yolog_debug("Read-ahead already active");
         return; /* nothing to do here */
     }
 
@@ -67,6 +69,7 @@ lcb_luv_read_nudge(lcb_luv_socket_t sock)
         yolog_err("Couldn't start read: %d",
                   sock->evstate[LCB_LUV_EV_READ].err);
     } else {
+        yolog_debug("read-ahead initialized");
         sock->read.buf.len = LCB_LUV_READAHEAD;
         sock->read.buf.base = sock->read.data;
         lcb_luv_socket_ref(sock);
@@ -80,7 +83,7 @@ lcb_luv_read_stop(lcb_luv_socket_t sock)
     if (sock->read.readhead_active == 0) {
         return;
     }
-    uv_read_stop(&sock->tcp);
+    uv_read_stop((uv_stream_t*)&sock->tcp);
     sock->read.readhead_active = 0;
     lcb_luv_socket_unref(sock);
 }
@@ -94,7 +97,8 @@ read_common(lcb_luv_socket_t sock, void *buffer, libcouchbase_size_t len,
     libcouchbase_ssize_t ret;
     size_t read_offset, toRead;
 
-//    yolog_debug("%p: Requested to read %d bytes into %p", sock, len, buffer);
+    yolog_debug("%d: Requested to read %d bytes. have %d",
+                sock->idx, len, sock->read.nb);
 
 
     /* basic error checking */

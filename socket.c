@@ -1,6 +1,6 @@
 #include "lcb_luv_internal.h"
 
-YOLOG_STATIC_INIT("socket", YOLOG_DEBUG);
+YOLOG_STATIC_INIT("socket", YOLOG_WARN);
 
 
 

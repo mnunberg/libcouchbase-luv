@@ -3,3 +3,4 @@
 test-main
 *.swp
 uv/*
+.depend

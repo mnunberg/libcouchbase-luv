@@ -1,5 +1,5 @@
 #include "lcb_luv_internal.h"
-
+YOLOG_STATIC_INIT("plugin", YOLOG_DEBUG);
 static void lcb_luv_noop(struct libcouchbase_io_opt_st *iops)
 {
     (void)iops;
@@ -28,6 +28,7 @@ invoke_stop_callback(struct libcouchbase_io_opt_st *iops)
 
 static void sync_loop_run(struct libcouchbase_io_opt_st *iops)
 {
+    yolog_info("=== LOOP: run ===");
     IOPS_COOKIE(iops)->do_stop = 0;
     while (IOPS_COOKIE(iops)->do_stop == 0) {
         uv_run_once(IOPS_COOKIE(iops)->loop);
@@ -36,6 +37,7 @@ static void sync_loop_run(struct libcouchbase_io_opt_st *iops)
 
 static void sync_loop_stop(struct libcouchbase_io_opt_st *iops)
 {
+    yolog_info("=== LOOP: stop ===");
     IOPS_COOKIE(iops)->do_stop = 1;
 }
 

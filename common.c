@@ -1,6 +1,6 @@
 #include "lcb_luv_internal.h"
 
-YOLOG_STATIC_INIT("common", YOLOG_DEBUG);
+YOLOG_STATIC_INIT("common", YOLOG_INFO);
 
 static void
 maybe_callout(lcb_luv_socket_t sock)
@@ -25,9 +25,9 @@ maybe_callout(lcb_luv_socket_t sock)
     yolog_debug("Will determine if we need to call any functions..");
     yolog_debug("which=%x, wait for=%x", which, sock->event->lcb_events);
     if (which) {
-        yolog_debug("Invoking callback for %d", sock->idx);
+        yolog_info(" ==== CB Invoking callback for %d =====", sock->idx);
         sock->event->lcb_cb(sock->idx, which, sock->event->lcb_arg);
-        yolog_debug("Done invoking callback for %d", sock->idx);
+        yolog_info("==== CB Done invoking callback for %d =====", sock->idx);
         lcb_luv_flush(sock);
     }
 
@@ -37,6 +37,7 @@ static void
 prepare_cb(uv_prepare_t *handle, int status)
 {
     lcb_luv_socket_t sock = (lcb_luv_socket_t)handle->data;
+    yolog_err("prepcb start");
     if (!sock) {
         fprintf(stderr, "We were called with prepare_t %p, with a missing socket\n",
                 handle);
@@ -46,12 +47,14 @@ prepare_cb(uv_prepare_t *handle, int status)
     lcb_luv_socket_ref(sock);
     maybe_callout(sock);
     lcb_luv_socket_unref(sock);
+    yolog_err("prepcb stop");
 }
 
 void
 lcb_luv_schedule_enable(lcb_luv_socket_t sock)
 {
     if (sock->prep_active) {
+        yolog_debug("prep_active is true");
         return;
     }
 
@@ -65,8 +68,10 @@ void
 lcb_luv_schedule_disable(lcb_luv_socket_t sock)
 {
     if (sock->prep_active == 0) {
+        yolog_debug("prep_active is false");
         return;
     }
+    yolog_debug("Disabling prepare");
     uv_prepare_stop(&sock->prep);
     lcb_luv_socket_unref(sock);
     sock->prep_active = 0;
@@ -146,6 +151,8 @@ lcb_luv_socket_deinit(lcb_luv_socket_t sock)
     if (sock->idx == -1) {
         return;
     }
+
+    yolog_warn("Deinitializing socket %d", sock->idx);
 
     lcb_luv_schedule_disable(sock);
 
