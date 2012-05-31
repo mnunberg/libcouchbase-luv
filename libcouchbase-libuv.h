@@ -1,6 +1,10 @@
 #ifndef LIBCOUCHBASE_LIBUV_H_
 #define LIBCOUCHBASE_LIBUV_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /* <sys/types.h> needed for size_t used in couchbase.h */
 #include <sys/types.h>
 
@@ -66,5 +70,10 @@ lcb_luv_create_io_opts(uv_loop_t *loop, uint16_t sock_max);
  */
 #define lcb_luv_from_iops(iops) \
     (struct lcb_luv_cookie_st *)(iops->cookie)
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
+
 
 #endif /* LIBCOUCHBASE_LIBUV_H_ */
