@@ -1,44 +1,63 @@
 # Beginning of tunables
 #
 # Location of libcouchbase source tree (should already be built)
-LIBCOUCHBASE_SRC=/sources/libcouchbase
+LIBCOUCHBASE_SRC := /sources/libcouchbase
 #
 # Directory where libcouchbase.so is found
-LIBCOUCHBASE_LIBDIR=$(LIBCOUCHBASE_SRC)/.libs
+LIBCOUCHBASE_LIBDIR := $(LIBCOUCHBASE_SRC)/.libs
 #
 # location of libcouchbase headers ( <libcouchbase/couchbase.h> )
-LIBCOUCHBASE_INCLUDE=$(LIBCOUCHBASE_SRC)/include
+LIBCOUCHBASE_INCLUDE := $(LIBCOUCHBASE_SRC)/include
 #
 #
 # path to a CLEAN source tree of libuv
-LIBUV_SRC=$(shell pwd)/uv
+LIBUV_SRC := $(shell pwd)/uv
 #
 # debug/optimization/warnings
-COMPILE_FLAGS=-O0 -ggdb3 -Wall
+COMPILE_FLAGS := -O0 -ggdb3 -Wall
 #
 # libraries which libuv.so itself requires
-LIBUV_LIBS=-ldl -lpthread -lrt -lm
+
+# LIBUV_INCLUDE is needed for building the actual plugin,
+# libuv libs are required for building the test programs.
+# nodejs does not come with a DSO of libuv, so you'll need
+# to build your own
+
+LIBUV_LIBS = -ldl -lpthread -lrt -lm
+LIBUV_INCLUDE := $(LIBUV_SRC)/include
 #
 # End of tunables
 # Here be dragons
 
 LIBUV_SO=libuv.so
-LIBUV_INCLUDE=$(LIBUV_SRC)/include
 LIBUV_A=$(LIBUV_SRC)/uv.a
 
+INCLUDE_FLAGS += -I$(LIBUV_INCLUDE) \
+				 $(LCB_LUV_FLAGS) \
+				 -I$(LIBCOUCHBASE_INCLUDE) \
+				 -I$(shell pwd)
 
-INCLUDE_FLAGS=-I$(LIBUV_INCLUDE) -I$(LIBCOUCHBASE_INCLUDE) -I$(shell pwd)
+CFLAGS := $(COMPILE_FLAGS) $(INCLUDE_FLAGS)
 
-CFLAGS=$(COMPILE_FLAGS) $(INCLUDE_FLAGS)
-
-LDFLAGS=-L$(LIBCOUCHBASE_LIBDIR) -L. \
+LDFLAGS := -L$(LIBCOUCHBASE_LIBDIR) -L. \
 		-Wl,-rpath=$(LIBCOUCHBASE_LIBDIR) \
 		-Wl,-rpath=$(shell pwd)
 
-LIBS_EXTRA=-lcurses -lcouchbase -luv
-UTIL_OBJ= util/hexdump.o util/yolog.o
+# Executables should link against these
+LIBS_EXE = -lcurses -lcouchbase -luv
 
-OBJECTS=read.o write.o socket.o common.o plugin-libuv.o timer.o $(UTIL_OBJ)
+UTIL_OBJ= \
+		  util/hexdump.o \
+		  util/yolog.o
+
+OBJECTS= \
+		read.o \
+		write.o \
+		socket.o \
+		common.o \
+		plugin-libuv.o \
+		timer.o \
+		$(UTIL_OBJ)
 
 all: libcouchbase_libuv.so
 
@@ -73,11 +92,11 @@ $(LIBUV_SO): $(LIBUV_A)
 		-Wl,--end-group \
 		$(LIBUV_LIBS)
 
-libcouchbase_libuv.so: $(OBJECTS) $(LIBUV_SO)
-	$(CC) -shared -o $@ $(OBJECTS) $(LDFLAGS) $(LIBS_EXTRA) $(LIBUV_SO)
+libcouchbase_libuv.so: $(OBJECTS)
+	$(CC) -shared -o $@ $(OBJECTS) -lcurses
 
-test-main: test/test.c test/simple_1.c libcouchbase_libuv.so
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $^
+test-main: test/test.c test/simple_1.c libcouchbase_libuv.so $(LIBUV_SO)
+	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $^ -lcouchbase -luv
 
 clean:
 	rm -f $(OBJECTS) *.o *.so test-main .depend
