@@ -30,9 +30,12 @@ static void sync_loop_run(struct libcouchbase_io_opt_st *iops)
 {
     yolog_info("=== LOOP: run ===");
     IOPS_COOKIE(iops)->do_stop = 0;
+    /** node's libuv does not export uv_run_once */
+#ifndef LCB_LUV_NODEJS
     while (IOPS_COOKIE(iops)->do_stop == 0) {
         uv_run_once(IOPS_COOKIE(iops)->loop);
     }
+#endif /* LCB_LUV_NODEJS */
 }
 
 static void sync_loop_stop(struct libcouchbase_io_opt_st *iops)
