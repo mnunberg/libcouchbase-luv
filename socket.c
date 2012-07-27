@@ -39,7 +39,8 @@ connect_cb(uv_connect_t* req, int status)
 
     if (status) {
         /* Error */
-        evstate->err = (uv_last_error(sock->parent->loop)).code;
+        evstate->err =
+                lcb_luv_errno_map((uv_last_error(sock->parent->loop)).code);
     } else {
         evstate->err = 0;
     }
@@ -119,7 +120,9 @@ lcb_luv_connect(struct libcouchbase_io_opt_st *iops,
         evstate->flags |= LCB_LUV_EVf_ACTIVE;
 
     } else {
-        iops->error = (uv_last_error(IOPS_COOKIE(iops)->loop)).code;
+        iops->error =
+                lcb_luv_errno_map(
+                        (uv_last_error(IOPS_COOKIE(iops)->loop)).code);
     }
     return retval;
 }

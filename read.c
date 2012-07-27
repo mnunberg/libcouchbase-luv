@@ -19,10 +19,11 @@ read_cb(uv_stream_t *stream, ssize_t nread, uv_buf_t buf)
 
     if (nread == -1) {
         uv_err_t last_err = uv_last_error(sock->parent->loop);
-        if (last_err.sys_errno_ == UV_EOF) {
+        if (last_err.code == UV_EOF) {
             sock->eof = 1;
         } else {
-            sock->evstate[LCB_LUV_EV_READ].err = last_err.code;
+            sock->evstate[LCB_LUV_EV_READ].err =
+                    lcb_luv_errno_map(last_err.code);
         }
         lcb_luv_read_stop(sock);
     } else if (nread) {
@@ -65,7 +66,8 @@ lcb_luv_read_nudge(lcb_luv_socket_t sock)
 
     if (status) {
         sock->evstate[LCB_LUV_EV_READ].err =
-                (uv_last_error(sock->parent->loop)).code;
+                lcb_luv_errno_map(
+                        (uv_last_error(sock->parent->loop)).code);
         yolog_err("Couldn't start read: %d",
                   sock->evstate[LCB_LUV_EV_READ].err);
     } else {

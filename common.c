@@ -291,3 +291,45 @@ lcb_luv_update_event(struct libcouchbase_io_opt_st *iops,
 
     return 1;
 }
+
+int
+lcb_luv_errno_map(int uverr)
+{
+
+#ifndef UNKNOWN
+#define UNKNOWN -1
+#endif
+
+#ifndef EAIFAMNOSUPPORT
+#define EAIFAMNOSUPPORT EAI_FAMILY
+#endif
+
+#ifndef EAISERVICE
+#define EAISERVICE EAI_SERVICE
+#endif
+
+#ifndef EADDRINFO
+#define EADDRINFO EAI_SYSTEM
+#endif
+
+#ifndef EAISOCKTYPE
+#define EAISOCKTYPE EAI_SOCKTYPE
+#endif
+
+#ifndef ECHARSET
+#define ECHARSET 0
+#endif
+
+#define OK 0
+
+    int ret = 0;
+#define X(errnum,errname,errdesc) \
+    if (uverr == UV_##errname) { \
+        return errname; \
+    }
+    UV_ERRNO_MAP(X);
+
+    return ret;
+
+#undef X
+}

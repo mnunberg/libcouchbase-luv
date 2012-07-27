@@ -23,7 +23,8 @@ write_cb(uv_write_t *req, int status)
     evstate = EVSTATE_FIND(sock, WRITE);
 
     if (status) {
-        evstate->err = (uv_last_error(sock->parent->loop)).code;
+        evstate->err =
+                lcb_luv_errno_map((uv_last_error(sock->parent->loop)).code);
     }
     yolog_debug("Flush done. Flushed %d bytes", sock->write.buf.len);
     sock->write.pos = 0;
@@ -71,7 +72,8 @@ lcb_luv_flush(lcb_luv_socket_t sock)
     lcb_luv_socket_ref(sock);
 
     if (status) {
-        evstate->err = (uv_last_error(sock->parent->loop)).code;
+        evstate->err =
+                lcb_luv_errno_map((uv_last_error(sock->parent->loop)).code);
     }
     evstate->flags |= LCB_LUV_EVf_FLUSHING;
 }

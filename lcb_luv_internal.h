@@ -272,4 +272,7 @@ lcb_luv_flush(lcb_luv_socket_t sock);
 void
 lcb_luv_hexdump(void* data, int size);
 
+int
+lcb_luv_errno_map(int uverr);
+
 #endif /* LCB_LUV_INTERNAL_H_ */
