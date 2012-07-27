@@ -1,8 +1,33 @@
 #include "lcb_luv_internal.h"
 YOLOG_STATIC_INIT("plugin", YOLOG_DEBUG);
-static void lcb_luv_noop(struct libcouchbase_io_opt_st *iops)
+static void __attribute__((unused))
+lcb_luv_noop(struct libcouchbase_io_opt_st *iops)
 {
     (void)iops;
+}
+
+static void
+lcb_luv_dtor(struct libcouchbase_io_opt_st *iops)
+{
+    /**
+     * First, clean up any dangling sockets
+     */
+    int ii;
+    struct lcb_luv_cookie_st *cookie = IOPS_COOKIE(iops);
+    uv_loop_t *l = cookie->loop;
+
+    for (ii = 0; ii < cookie->fd_max; ii++) {
+        if (cookie->socktable[ii]) {
+            yolog_warn("Dangling socket structure %p with index %d",
+                       cookie->socktable + ii,
+                       ii);
+        }
+    }
+
+    yolog_debug("Destroying %p", iops);
+    free (cookie->socktable);
+    free (cookie);
+    free (iops);
 }
 
 static void
@@ -51,7 +76,6 @@ lcb_luv_create_io_opts(uv_loop_t *loop, uint16_t sock_max)
     struct lcb_luv_cookie_st *cookie = calloc(1, sizeof(*cookie));
 
     assert(loop);
-    uv_ref(loop);
     cookie->loop = loop;
     assert(loop);
 
@@ -88,7 +112,7 @@ lcb_luv_create_io_opts(uv_loop_t *loop, uint16_t sock_max)
     ret->run_event_loop = invoke_start_callback;
     ret->stop_event_loop = invoke_stop_callback;
 
-    ret->destructor = lcb_luv_noop;
+    ret->destructor = lcb_luv_dtor;
 
     return ret;
 }
