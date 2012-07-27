@@ -1,4 +1,6 @@
 #include "lcb_luv_internal.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 YOLOG_STATIC_INIT("common", YOLOG_INFO);
 
@@ -133,14 +135,26 @@ void lcb_luv_socket_free(lcb_luv_socket_t sock)
     free(sock);
 }
 
+static void
+close_cb(uv_handle_t* handle)
+{
+    lcb_luv_socket_t sock = (lcb_luv_socket_t)handle;
+    lcb_luv_socket_free(sock);
+    yolog_warn("Refcount is now %d",
+               uv_loop_refcount(uv_default_loop()));
+}
+
+
 unsigned long
 lcb_luv_socket_unref(lcb_luv_socket_t sock)
 {
     unsigned long ret;
+    assert (sock->refcount);
     sock->refcount--;
     ret = sock->refcount;
+
     if (ret == 0) {
-        lcb_luv_socket_free(sock);
+        uv_close((uv_handle_t*)&sock->tcp, close_cb);
     }
     return ret;
 }
@@ -161,13 +175,28 @@ lcb_luv_socket_deinit(lcb_luv_socket_t sock)
         sock->event = NULL;
     }
 
-    if (EVSTATE_IS(&sock->evstate[LCB_LUV_EV_READ], ACTIVE)) {
-        uv_read_stop((uv_stream_t*)&sock->tcp);
-        sock->evstate[LCB_LUV_EV_READ].flags = 0;
-    }
+    lcb_luv_read_stop(sock);
+
+    assert (sock->tcp.write_watcher.active == 0);
+    assert (sock->tcp.read_watcher.active == 0);
+    assert (sock->prep_active == 0);
 
     sock->parent->socktable[sock->idx] = 0;
     sock->idx = -1;
+
+    if (sock->refcount > 1) {
+        yolog_warn("Socket %p still has a reference count of %d",
+                   sock, sock->refcount);
+        int ii;
+        for (ii = 0; ii < LCB_LUV_EV_MAX; ii++) {
+            struct lcb_luv_evstate_st *evstate = sock->evstate + ii;
+            yolog_warn("Flags for evstate@%d: 0x%X", ii, evstate->flags);
+        }
+
+        yolog_warn("Write buffer has %d bytes", sock->write.nb);
+        yolog_warn("Write position is at %d", sock->write.pos);
+        yolog_warn("Read buffer has %d bytes", sock->read.nb);
+    }
     lcb_luv_socket_unref(sock);
 }
 
@@ -275,18 +304,12 @@ lcb_luv_update_event(struct libcouchbase_io_opt_st *iops,
          */
         if ((sock->evstate[LCB_LUV_EV_WRITE].flags & LCB_LUV_EVf_FLUSHING) == 0 &&
                 sock->write.nb == 0) {
-//            yolog_debug("Setting pending flags because write requested and write buffer is free");
             sock->evstate[LCB_LUV_EV_WRITE].flags |= LCB_LUV_EVf_PENDING;
         }
 
         lcb_luv_schedule_enable(sock);
     } else {
-        /* we might need to disable scheduling, unless we have data inside
-         * the read (read events are pending)
-         */
-        if ((sock->evstate[LCB_LUV_EV_READ].flags & LCB_LUV_EVf_PENDING) == 0) {
-            /* Do we do anything here? */
-        }
+        sock->evstate[LCB_LUV_EV_WRITE].flags &= (~LCB_LUV_EVf_PENDING);
     }
 
     return 1;
