@@ -1,5 +1,5 @@
 #include "lcb_luv_internal.h"
-YOLOG_STATIC_INIT("plugin", YOLOG_DEBUG);
+
 static void __attribute__((unused))
 lcb_luv_noop(struct libcouchbase_io_opt_st *iops)
 {
@@ -18,13 +18,13 @@ lcb_luv_dtor(struct libcouchbase_io_opt_st *iops)
 
     for (ii = 0; ii < cookie->fd_max; ii++) {
         if (cookie->socktable[ii]) {
-            yolog_warn("Dangling socket structure %p with index %d",
+            log_iops_warn("Dangling socket structure %p with index %d",
                        cookie->socktable + ii,
                        ii);
         }
     }
 
-    yolog_debug("Destroying %p", iops);
+    log_iops_debug("Destroying %p", iops);
     free (cookie->socktable);
     free (cookie);
     free (iops);
@@ -53,7 +53,7 @@ invoke_stop_callback(struct libcouchbase_io_opt_st *iops)
 
 static void sync_loop_run(struct libcouchbase_io_opt_st *iops)
 {
-    yolog_info("=== LOOP: run ===");
+    log_iops_info("=== LOOP: run ===");
     IOPS_COOKIE(iops)->do_stop = 0;
     /** node's libuv does not export uv_run_once */
 #ifndef LCB_LUV_NODEJS
@@ -65,7 +65,7 @@ static void sync_loop_run(struct libcouchbase_io_opt_st *iops)
 
 static void sync_loop_stop(struct libcouchbase_io_opt_st *iops)
 {
-    yolog_info("=== LOOP: stop ===");
+    log_iops_info("=== LOOP: stop ===");
     IOPS_COOKIE(iops)->do_stop = 1;
 }
 

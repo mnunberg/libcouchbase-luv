@@ -7,7 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <errno.h>
-#include "util/yolog.h"
+#include "util/lcb_luv_yolog.h"
 
 #define EVSTATE_IS(p, b) \
     ( ( (p)->flags ) & LCB_LUV_EVf_ ## b)

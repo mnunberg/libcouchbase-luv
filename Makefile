@@ -44,11 +44,11 @@ LDFLAGS := -L$(LIBCOUCHBASE_LIBDIR) -L. \
 		-Wl,-rpath=$(shell pwd)
 
 # Executables should link against these
-LIBS_EXE = -lcurses -lcouchbase -luv
+LIBS_EXE = -lcouchbase -luv
 
 UTIL_OBJ= \
 		  util/hexdump.o \
-		  util/yolog.o
+		  util/lcb_luv_yolog.o
 
 OBJECTS= \
 		read.o \
@@ -93,7 +93,7 @@ $(LIBUV_SO): $(LIBUV_A)
 		$(LIBUV_LIBS)
 
 libcouchbase_libuv.so: $(OBJECTS)
-	$(CC) -shared -o $@ $(OBJECTS) -lcurses
+	$(CC) -shared -o $@ $(OBJECTS)
 
 test-main: test/test.c test/simple_1.c libcouchbase_libuv.so $(LIBUV_SO)
 	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $^ -lcouchbase -luv

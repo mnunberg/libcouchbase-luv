@@ -1,8 +1,5 @@
 #include "lcb_luv_internal.h"
 
-YOLOG_STATIC_INIT("socket", YOLOG_WARN);
-
-
 
 
 libcouchbase_socket_t
@@ -16,7 +13,7 @@ lcb_luv_socket(struct libcouchbase_io_opt_st *iops,
 
     if ( (domain != AF_INET && domain != AF_INET6) ||
             type != SOCK_STREAM || protocol != IPPROTO_TCP)  {
-        yolog_err("Bad arguments: domain=%d, type=%d, protocol=%d",
+        log_socket_error("Bad arguments: domain=%d, type=%d, protocol=%d",
                 domain, type, protocol);
         return -1;
     }
@@ -35,7 +32,7 @@ connect_cb(uv_connect_t* req, int status)
     lcb_luv_socket_t sock = (lcb_luv_socket_t)req->handle;
     struct lcb_luv_evstate_st *evstate = sock->evstate + LCB_LUV_EV_CONNECT;
     evstate->flags |= LCB_LUV_EVf_PENDING;
-    yolog_debug("Connection callback: status=%d", status);
+    log_socket_info("Connection callback: status=%d", status);
 
     if (status) {
         /* Error */
@@ -49,7 +46,7 @@ connect_cb(uv_connect_t* req, int status)
      * callback
      */
     if (sock->event && (sock->event->lcb_events & LIBCOUCHBASE_WRITE_EVENT)) {
-        yolog_debug("Invoking libcouchbase write callback...");
+        log_socket_debug("Invoking libcouchbase write callback...");
         sock->event->lcb_cb(sock->idx, LIBCOUCHBASE_WRITE_EVENT, sock->event->lcb_arg);
     }
 
@@ -76,7 +73,7 @@ lcb_luv_connect(struct libcouchbase_io_opt_st *iops,
 
     /* Subsequent calls to connect() */
     if (EVSTATE_IS(evstate, ACTIVE)) {
-        yolog_debug("We were called again for connect()");
+        log_socket_trace("We were called again for connect()");
         if (EVSTATE_IS(evstate, PENDING)) {
             retval = evstate->err;
             if (retval) {
@@ -95,7 +92,7 @@ lcb_luv_connect(struct libcouchbase_io_opt_st *iops,
                 iops->error = EINPROGRESS;
             }
         }
-        yolog_debug("Returning %d for status", retval);
+        log_socket_trace("Returning %d for status", retval);
         return retval;
     }
 
@@ -133,6 +130,8 @@ lcb_luv_close(struct libcouchbase_io_opt_st *iops, libcouchbase_socket_t sock_i)
     /* Free a socket */
     lcb_luv_socket_t sock = lcb_luv_sock_from_idx(iops, sock_i);
     if (!sock) {
+        log_socket_crit("Attempt to close already-closed socket. Abort");
+        abort();
         iops->error = EBADF;
         return;
     }

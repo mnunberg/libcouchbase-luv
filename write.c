@@ -7,8 +7,6 @@
  * will not block.
  */
 
-YOLOG_STATIC_INIT("write", YOLOG_DEBUG);
-
 static void
 write_cb(uv_write_t *req, int status)
 {
@@ -26,7 +24,7 @@ write_cb(uv_write_t *req, int status)
         evstate->err =
                 lcb_luv_errno_map((uv_last_error(sock->parent->loop)).code);
     }
-    yolog_debug("Flush done. Flushed %d bytes", sock->write.buf.len);
+    log_write_debug("Flush done. Flushed %d bytes", sock->write.buf.len);
     sock->write.pos = 0;
     sock->write.nb = 0;
     evstate->flags |= LCB_LUV_EVf_PENDING;
@@ -59,13 +57,13 @@ lcb_luv_flush(lcb_luv_socket_t sock)
 
     evstate = EVSTATE_FIND(sock, WRITE);
     if(EVSTATE_IS(evstate, FLUSHING)) {
-        yolog_warn("Not flushing because we are in the middle of a flush");
+        log_write_info("Not flushing because we are in the middle of a flush");
         return;
     }
 
     sock->write.buf.base = sock->write.data;
     sock->write.buf.len = sock->write.nb;
-    yolog_debug("Will flush");
+    log_write_debug("Will flush");
     status = uv_write(&sock->u_req.write,
                         (uv_stream_t*)&sock->tcp,
                         &sock->write.buf, 1, write_cb);
@@ -85,24 +83,25 @@ write_common(lcb_luv_socket_t sock, const void *buf, size_t len, int *errno_out)
     libcouchbase_ssize_t ret;
     struct lcb_luv_evstate_st *evstate = EVSTATE_FIND(sock, WRITE);
 
-    yolog_debug("%d: Requested to write %d bytes from %p", sock->idx, len, buf);
+    log_write_debug("%d: Requested to write %d bytes from %p",
+                    sock->idx, len, buf);
 
     if (evstate->err) {
-        yolog_warn("Socket has pending error %d", evstate->err);
+        log_write_warn("Socket has pending error %d", evstate->err);
         *errno_out = evstate->err;
         evstate->err = 0;
         return -1;
     }
 
     if (EVSTATE_IS(evstate, FLUSHING)) {
-        yolog_warn("Will not write because we are inside a flush");
+        log_write_info("Will not write because we are inside a flush");
         *errno_out = EWOULDBLOCK;
         return -1;
     }
 
     ret = MINIMUM(len, sizeof(sock->write.data) - sock->write.nb);
     if (ret == 0) {
-        yolog_warn("We have no more space inside the buffer");
+        log_write_info("We have no more space inside the buffer");
         *errno_out = EWOULDBLOCK;
         return -1;
     }
@@ -113,7 +112,7 @@ write_common(lcb_luv_socket_t sock, const void *buf, size_t len, int *errno_out)
 //    lcb_luv_hexdump(sock->write.data + sock->write.pos, ret);
     sock->write.pos += ret;
     sock->write.nb += ret;
-    yolog_debug("Returning %d", ret);
+    log_write_trace("Returning %d", ret);
     return ret;
 }
 

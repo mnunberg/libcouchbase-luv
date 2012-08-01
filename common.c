@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-YOLOG_STATIC_INIT("common", YOLOG_INFO);
-
 static void
 maybe_callout(lcb_luv_socket_t sock)
 {
@@ -24,22 +22,21 @@ maybe_callout(lcb_luv_socket_t sock)
     check_if_ready(WRITE);
 #undef check_if_ready
 
-    yolog_debug("Will determine if we need to call any functions..");
-    yolog_debug("which=%x, wait for=%x", which, sock->event->lcb_events);
+    log_loop_rant("Will determine if we need to call any functions..");
+    log_loop_rant("which=%x, wait for=%x", which, sock->event->lcb_events);
     if (which) {
-        yolog_info(" ==== CB Invoking callback for %d =====", sock->idx);
+        log_loop_debug(" ==== CB Invoking callback for %d =====", sock->idx);
         sock->event->lcb_cb(sock->idx, which, sock->event->lcb_arg);
-        yolog_info("==== CB Done invoking callback for %d =====", sock->idx);
+        log_loop_debug("==== CB Done invoking callback for %d =====", sock->idx);
         lcb_luv_flush(sock);
     }
-
 }
 
 static void
 prepare_cb(uv_prepare_t *handle, int status)
 {
     lcb_luv_socket_t sock = (lcb_luv_socket_t)handle->data;
-    yolog_err("prepcb start");
+    log_loop_trace("prepcb start");
     if (!sock) {
         fprintf(stderr, "We were called with prepare_t %p, with a missing socket\n",
                 handle);
@@ -49,18 +46,18 @@ prepare_cb(uv_prepare_t *handle, int status)
     lcb_luv_socket_ref(sock);
     maybe_callout(sock);
     lcb_luv_socket_unref(sock);
-    yolog_err("prepcb stop");
+    log_loop_trace("prepcb stop");
 }
 
 void
 lcb_luv_schedule_enable(lcb_luv_socket_t sock)
 {
     if (sock->prep_active) {
-        yolog_debug("prep_active is true");
+        log_loop_trace("prep_active is true");
         return;
     }
 
-    yolog_debug("Will try and schedule prepare callback for %d", sock->idx);
+    log_loop_debug("Will try and schedule prepare callback for %d", sock->idx);
     lcb_luv_socket_ref(sock);
     uv_prepare_start(&sock->prep, prepare_cb);
     sock->prep_active = 1;
@@ -70,10 +67,10 @@ void
 lcb_luv_schedule_disable(lcb_luv_socket_t sock)
 {
     if (sock->prep_active == 0) {
-        yolog_debug("prep_active is false");
+        log_loop_trace("prep_active is false");
         return;
     }
-    yolog_debug("Disabling prepare");
+    log_loop_debug("Disabling prepare");
     uv_prepare_stop(&sock->prep);
     lcb_luv_socket_unref(sock);
     sock->prep_active = 0;
@@ -140,7 +137,7 @@ close_cb(uv_handle_t* handle)
 {
     lcb_luv_socket_t sock = (lcb_luv_socket_t)handle;
     lcb_luv_socket_free(sock);
-    yolog_warn("Refcount is now %d",
+    log_socket_info("Refcount is now %d",
                uv_loop_refcount(uv_default_loop()));
 }
 
@@ -166,7 +163,7 @@ lcb_luv_socket_deinit(lcb_luv_socket_t sock)
         return;
     }
 
-    yolog_warn("Deinitializing socket %d", sock->idx);
+    log_socket_info("Deinitializing socket %d", sock->idx);
 
     lcb_luv_schedule_disable(sock);
 
@@ -185,17 +182,17 @@ lcb_luv_socket_deinit(lcb_luv_socket_t sock)
     sock->idx = -1;
 
     if (sock->refcount > 1) {
-        yolog_warn("Socket %p still has a reference count of %d",
+        log_socket_warn("Socket %p still has a reference count of %d",
                    sock, sock->refcount);
         int ii;
         for (ii = 0; ii < LCB_LUV_EV_MAX; ii++) {
             struct lcb_luv_evstate_st *evstate = sock->evstate + ii;
-            yolog_warn("Flags for evstate@%d: 0x%X", ii, evstate->flags);
+            log_socket_warn("Flags for evstate@%d: 0x%X", ii, evstate->flags);
         }
 
-        yolog_warn("Write buffer has %d bytes", sock->write.nb);
-        yolog_warn("Write position is at %d", sock->write.pos);
-        yolog_warn("Read buffer has %d bytes", sock->read.nb);
+        log_socket_warn("Write buffer has %d bytes", sock->write.nb);
+        log_socket_warn("Write position is at %d", sock->write.pos);
+        log_socket_warn("Read buffer has %d bytes", sock->read.nb);
     }
     lcb_luv_socket_unref(sock);
 }
@@ -275,11 +272,11 @@ lcb_luv_update_event(struct libcouchbase_io_opt_st *iops,
     /* Check to see if our 'socket' is valid */
     lcb_luv_socket_t sock = lcb_luv_sock_from_idx(iops, sock_i);
     if (sock == NULL) {
-        yolog_err("Requested update on invalid socket: fd=%d", sock_i);
+        log_event_error("Requested update on invalid socket: fd=%d", sock_i);
         return 0;
     }
 
-    yolog_debug("Requested events %x", flags);
+    log_event_debug("Requested events %x", flags);
 
     if (sock->event) {
         assert(sock->event == event);
