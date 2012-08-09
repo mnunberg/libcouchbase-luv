@@ -1,5 +1,7 @@
 #include "lcb_luv_internal.h"
 
+static int _yolog_initialized = 0;
+
 static void __attribute__((unused))
 lcb_luv_noop(struct libcouchbase_io_opt_st *iops)
 {
@@ -74,6 +76,10 @@ lcb_luv_create_io_opts(uv_loop_t *loop, uint16_t sock_max)
 {
     struct libcouchbase_io_opt_st *ret = calloc(1, sizeof(*ret));
     struct lcb_luv_cookie_st *cookie = calloc(1, sizeof(*cookie));
+
+    if (!_yolog_initialized) {
+        lcb_luv_yolog_init(NULL);
+    }
 
     assert(loop);
     cookie->loop = loop;

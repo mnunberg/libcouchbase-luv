@@ -620,9 +620,9 @@ lcb_luv_yolog_init(const char *configfile);
 
 #define lcb_luv_yolog_subsys_count() (LCB_LUV_YOLOG_LOGGING_SUBSYS__COUNT)
 
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_RANT)
-#define log_rant(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 0))
+#define log_rant(...)
 #else
 #define log_rant(...) \
 lcb_luv_yolog_logger(\
@@ -633,9 +633,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_TRACE)
-#define log_trace(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 1))
+#define log_trace(...)
 #else
 #define log_trace(...) \
 lcb_luv_yolog_logger(\
@@ -646,9 +646,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_STATE)
-#define log_state(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 2))
+#define log_state(...)
 #else
 #define log_state(...) \
 lcb_luv_yolog_logger(\
@@ -659,9 +659,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_DEBUG)
-#define log_debug(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 3))
+#define log_debug(...)
 #else
 #define log_debug(...) \
 lcb_luv_yolog_logger(\
@@ -672,9 +672,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_INFO)
-#define log_info(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 4))
+#define log_info(...)
 #else
 #define log_info(...) \
 lcb_luv_yolog_logger(\
@@ -685,9 +685,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_WARN)
-#define log_warn(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 5))
+#define log_warn(...)
 #else
 #define log_warn(...) \
 lcb_luv_yolog_logger(\
@@ -698,9 +698,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_ERROR)
-#define log_error(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 6))
+#define log_error(...)
 #else
 #define log_error(...) \
 lcb_luv_yolog_logger(\
@@ -711,9 +711,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_CRIT)
-#define log_crit(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 7))
+#define log_crit(...)
 #else
 #define log_crit(...) \
 lcb_luv_yolog_logger(\
@@ -724,9 +724,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_RANT)
-#define log_read_rant(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 0))
+#define log_read_rant(...)
 #else
 #define log_read_rant(...) \
 lcb_luv_yolog_logger(\
@@ -737,9 +737,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_TRACE)
-#define log_read_trace(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 1))
+#define log_read_trace(...)
 #else
 #define log_read_trace(...) \
 lcb_luv_yolog_logger(\
@@ -750,9 +750,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_STATE)
-#define log_read_state(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 2))
+#define log_read_state(...)
 #else
 #define log_read_state(...) \
 lcb_luv_yolog_logger(\
@@ -763,9 +763,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_DEBUG)
-#define log_read_debug(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 3))
+#define log_read_debug(...)
 #else
 #define log_read_debug(...) \
 lcb_luv_yolog_logger(\
@@ -776,9 +776,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_INFO)
-#define log_read_info(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 4))
+#define log_read_info(...)
 #else
 #define log_read_info(...) \
 lcb_luv_yolog_logger(\
@@ -789,9 +789,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_WARN)
-#define log_read_warn(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 5))
+#define log_read_warn(...)
 #else
 #define log_read_warn(...) \
 lcb_luv_yolog_logger(\
@@ -802,9 +802,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_ERROR)
-#define log_read_error(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 6))
+#define log_read_error(...)
 #else
 #define log_read_error(...) \
 lcb_luv_yolog_logger(\
@@ -815,9 +815,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_CRIT)
-#define log_read_crit(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 7))
+#define log_read_crit(...)
 #else
 #define log_read_crit(...) \
 lcb_luv_yolog_logger(\
@@ -828,9 +828,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_RANT)
-#define log_iops_rant(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 0))
+#define log_iops_rant(...)
 #else
 #define log_iops_rant(...) \
 lcb_luv_yolog_logger(\
@@ -841,9 +841,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_TRACE)
-#define log_iops_trace(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 1))
+#define log_iops_trace(...)
 #else
 #define log_iops_trace(...) \
 lcb_luv_yolog_logger(\
@@ -854,9 +854,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_STATE)
-#define log_iops_state(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 2))
+#define log_iops_state(...)
 #else
 #define log_iops_state(...) \
 lcb_luv_yolog_logger(\
@@ -867,9 +867,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_DEBUG)
-#define log_iops_debug(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 3))
+#define log_iops_debug(...)
 #else
 #define log_iops_debug(...) \
 lcb_luv_yolog_logger(\
@@ -880,9 +880,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_INFO)
-#define log_iops_info(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 4))
+#define log_iops_info(...)
 #else
 #define log_iops_info(...) \
 lcb_luv_yolog_logger(\
@@ -893,9 +893,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_WARN)
-#define log_iops_warn(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 5))
+#define log_iops_warn(...)
 #else
 #define log_iops_warn(...) \
 lcb_luv_yolog_logger(\
@@ -906,9 +906,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_ERROR)
-#define log_iops_error(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 6))
+#define log_iops_error(...)
 #else
 #define log_iops_error(...) \
 lcb_luv_yolog_logger(\
@@ -919,9 +919,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_CRIT)
-#define log_iops_crit(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 7))
+#define log_iops_crit(...)
 #else
 #define log_iops_crit(...) \
 lcb_luv_yolog_logger(\
@@ -932,9 +932,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_RANT)
-#define log_event_rant(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 0))
+#define log_event_rant(...)
 #else
 #define log_event_rant(...) \
 lcb_luv_yolog_logger(\
@@ -945,9 +945,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_TRACE)
-#define log_event_trace(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 1))
+#define log_event_trace(...)
 #else
 #define log_event_trace(...) \
 lcb_luv_yolog_logger(\
@@ -958,9 +958,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_STATE)
-#define log_event_state(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 2))
+#define log_event_state(...)
 #else
 #define log_event_state(...) \
 lcb_luv_yolog_logger(\
@@ -971,9 +971,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_DEBUG)
-#define log_event_debug(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 3))
+#define log_event_debug(...)
 #else
 #define log_event_debug(...) \
 lcb_luv_yolog_logger(\
@@ -984,9 +984,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_INFO)
-#define log_event_info(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 4))
+#define log_event_info(...)
 #else
 #define log_event_info(...) \
 lcb_luv_yolog_logger(\
@@ -997,9 +997,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_WARN)
-#define log_event_warn(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 5))
+#define log_event_warn(...)
 #else
 #define log_event_warn(...) \
 lcb_luv_yolog_logger(\
@@ -1010,9 +1010,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_ERROR)
-#define log_event_error(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 6))
+#define log_event_error(...)
 #else
 #define log_event_error(...) \
 lcb_luv_yolog_logger(\
@@ -1023,9 +1023,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_CRIT)
-#define log_event_crit(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 7))
+#define log_event_crit(...)
 #else
 #define log_event_crit(...) \
 lcb_luv_yolog_logger(\
@@ -1036,9 +1036,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_RANT)
-#define log_socket_rant(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 0))
+#define log_socket_rant(...)
 #else
 #define log_socket_rant(...) \
 lcb_luv_yolog_logger(\
@@ -1049,9 +1049,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_TRACE)
-#define log_socket_trace(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 1))
+#define log_socket_trace(...)
 #else
 #define log_socket_trace(...) \
 lcb_luv_yolog_logger(\
@@ -1062,9 +1062,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_STATE)
-#define log_socket_state(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 2))
+#define log_socket_state(...)
 #else
 #define log_socket_state(...) \
 lcb_luv_yolog_logger(\
@@ -1075,9 +1075,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_DEBUG)
-#define log_socket_debug(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 3))
+#define log_socket_debug(...)
 #else
 #define log_socket_debug(...) \
 lcb_luv_yolog_logger(\
@@ -1088,9 +1088,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_INFO)
-#define log_socket_info(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 4))
+#define log_socket_info(...)
 #else
 #define log_socket_info(...) \
 lcb_luv_yolog_logger(\
@@ -1101,9 +1101,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_WARN)
-#define log_socket_warn(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 5))
+#define log_socket_warn(...)
 #else
 #define log_socket_warn(...) \
 lcb_luv_yolog_logger(\
@@ -1114,9 +1114,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_ERROR)
-#define log_socket_error(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 6))
+#define log_socket_error(...)
 #else
 #define log_socket_error(...) \
 lcb_luv_yolog_logger(\
@@ -1127,9 +1127,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_CRIT)
-#define log_socket_crit(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 7))
+#define log_socket_crit(...)
 #else
 #define log_socket_crit(...) \
 lcb_luv_yolog_logger(\
@@ -1140,9 +1140,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_RANT)
-#define log_write_rant(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 0))
+#define log_write_rant(...)
 #else
 #define log_write_rant(...) \
 lcb_luv_yolog_logger(\
@@ -1153,9 +1153,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_TRACE)
-#define log_write_trace(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 1))
+#define log_write_trace(...)
 #else
 #define log_write_trace(...) \
 lcb_luv_yolog_logger(\
@@ -1166,9 +1166,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_STATE)
-#define log_write_state(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 2))
+#define log_write_state(...)
 #else
 #define log_write_state(...) \
 lcb_luv_yolog_logger(\
@@ -1179,9 +1179,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_DEBUG)
-#define log_write_debug(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 3))
+#define log_write_debug(...)
 #else
 #define log_write_debug(...) \
 lcb_luv_yolog_logger(\
@@ -1192,9 +1192,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_INFO)
-#define log_write_info(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 4))
+#define log_write_info(...)
 #else
 #define log_write_info(...) \
 lcb_luv_yolog_logger(\
@@ -1205,9 +1205,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_WARN)
-#define log_write_warn(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 5))
+#define log_write_warn(...)
 #else
 #define log_write_warn(...) \
 lcb_luv_yolog_logger(\
@@ -1218,9 +1218,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_ERROR)
-#define log_write_error(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 6))
+#define log_write_error(...)
 #else
 #define log_write_error(...) \
 lcb_luv_yolog_logger(\
@@ -1231,9 +1231,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_CRIT)
-#define log_write_crit(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 7))
+#define log_write_crit(...)
 #else
 #define log_write_crit(...) \
 lcb_luv_yolog_logger(\
@@ -1244,9 +1244,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_RANT)
-#define log_loop_rant(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 0))
+#define log_loop_rant(...)
 #else
 #define log_loop_rant(...) \
 lcb_luv_yolog_logger(\
@@ -1257,9 +1257,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_TRACE)
-#define log_loop_trace(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 1))
+#define log_loop_trace(...)
 #else
 #define log_loop_trace(...) \
 lcb_luv_yolog_logger(\
@@ -1270,9 +1270,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_STATE)
-#define log_loop_state(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 2))
+#define log_loop_state(...)
 #else
 #define log_loop_state(...) \
 lcb_luv_yolog_logger(\
@@ -1283,9 +1283,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_DEBUG)
-#define log_loop_debug(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 3))
+#define log_loop_debug(...)
 #else
 #define log_loop_debug(...) \
 lcb_luv_yolog_logger(\
@@ -1296,9 +1296,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_INFO)
-#define log_loop_info(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 4))
+#define log_loop_info(...)
 #else
 #define log_loop_info(...) \
 lcb_luv_yolog_logger(\
@@ -1309,9 +1309,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_WARN)
-#define log_loop_warn(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 5))
+#define log_loop_warn(...)
 #else
 #define log_loop_warn(...) \
 lcb_luv_yolog_logger(\
@@ -1322,9 +1322,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_ERROR)
-#define log_loop_error(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 6))
+#define log_loop_error(...)
 #else
 #define log_loop_error(...) \
 lcb_luv_yolog_logger(\
@@ -1335,9 +1335,9 @@ lcb_luv_yolog_logger(\
     __func__, \
     ## __VA_ARGS__)
 #endif /* LCB_LUV_YOLOG_NDEBUG_LEVEL */
-#if (defined LCB_LUV_YOLOG_NDEBUG_LEVEL \
-    && LCB_LUV_YOLOG_NDEBUG_LEVEL > LCB_LUV_YOLOG_CRIT)
-#define log_loop_crit(args)
+#if (defined LCB_LUV_YOLOG_DEBUG_LEVEL \
+    && (LCB_LUV_YOLOG_DEBUG_LEVEL > 7))
+#define log_loop_crit(...)
 #else
 #define log_loop_crit(...) \
 lcb_luv_yolog_logger(\

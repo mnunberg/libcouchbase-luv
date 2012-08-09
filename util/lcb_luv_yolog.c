@@ -324,13 +324,30 @@ lcb_luv_yolog_vlogger(lcb_luv_yolog_context *ctx,
 
         lcb_luv_yolog_dest_lock(out);
 
+#ifndef va_copy
+#define LCB_LUV_YOLOG_VACOPY_OVERRIDE
+#ifdef __GNUC__
+#define va_copy __va_copy
+#else
+#define va_copy(dst, src) (dst) = (src)
+#endif /* __GNUC__ */
+#endif
+
         lcb_luv_yolog_fmt_write(fmtv, fp, &msginfo);
-        vfprintf(fp, fmt, ap);
+        {
+            va_list vacp;
+            va_copy(vacp, ap);
+            vfprintf(fp, fmt, vacp);
+            va_end(vacp);
+        }
         fprintf(fp, "%s\n", msginfo.co_reset);
         fflush(fp);
-
         lcb_luv_yolog_dest_unlock(out);
     }
+#ifdef LCB_LUV_YOLOG_VACOPY_OVERRIDE
+#undef va_copy
+#undef LCB_LUV_YOLOG_VACOPY_OVERRIDE
+#endif
 }
 
 void
