@@ -62,7 +62,7 @@ typedef struct {
     uv_loop_t *loop;
 
     /** Refcount. When this hits zero we free this */
-    unsigned int refcount;
+    unsigned int iops_refcount;
 
     /** Whether using a user-initiated loop. In this case we don't wait/stop */
     int external_loop;
@@ -88,10 +88,13 @@ typedef struct {
 static void decref_iops(lcb_io_opt_t iobase)
 {
     my_iops_t *io = (my_iops_t*)iobase;
-    if (io->refcount--) {
+    assert(io->iops_refcount);
+    if (--io->iops_refcount) {
         return;
     }
+
     memset(io, 0xff, sizeof(*io));
+    free(io);
 }
 
 
@@ -102,6 +105,12 @@ static void set_last_error(my_iops_t *io, int error)
         return;
     }
     io->base.v.v1.error = lcbuv_errno_map(uv_last_error(io->loop).code);
+}
+
+static void free_bufinfo_common(struct lcb_buf_info *bi)
+{
+    free(bi->root);
+    free(bi->ringbuffer);
 }
 
 /******************************************************************************
@@ -123,7 +132,7 @@ static lcb_sockdata_t *create_socket(lcb_io_opt_t iobase,
     }
 
     uv_tcp_init(io->loop, &ret->tcp);
-
+    io->iops_refcount++;
     ret->base.refcount = 1;
 
     set_last_error(io, 0);
@@ -143,11 +152,11 @@ static void close_callback(uv_handle_t *handle)
 
     assert(sock->base.refcount == 0);
 
-    free(sock->base.read_buffer.ringbuffer);
-    free(sock->base.read_buffer.root);
-    uv_unref(handle);
+    free_bufinfo_common(&sock->base.read_buffer);
+
     memset(sock, 0xEE, sizeof(*sock));
     free(sock);
+    
     decref_iops(&io->base);
 }
 
@@ -230,9 +239,9 @@ static lcb_io_writebuf_t *create_writebuf(lcb_io_opt_t iobase)
 
 static void release_writebuf(lcb_io_opt_t iobase, lcb_io_writebuf_t *buf)
 {
-    free(buf->buffer.ringbuffer);
-    free(buf->buffer.root);
+    free_bufinfo_common(&buf->buffer);
     memset(buf, 0xff, sizeof(my_writebuf_t));
+    free(buf);
 
     (void)iobase;
 }
@@ -402,7 +411,7 @@ static void *create_timer(lcb_io_opt_t iobase)
     }
 
     timer->parent = io;
-    io->refcount++;
+    io->iops_refcount++;
     uv_timer_init(io->loop, &timer->uvt);
 
     return timer;
@@ -456,7 +465,7 @@ static void destroy_timer(lcb_io_opt_t io, void *timer_opaque)
 static void run_event_loop(lcb_io_opt_t iobase)
 {
     my_iops_t *io = (my_iops_t*)iobase;
-    io->refcount++;
+    io->iops_refcount++;
     if (!io->external_loop) {
         uv_run(io->loop, UV_RUN_DEFAULT);
     }
@@ -515,7 +524,7 @@ lcb_error_t lcbuv_new_iops(lcb_io_opt_t *io, uv_loop_t *loop)
     /* dtor */
     iop->destructor = decref_iops;
 
-    ret->refcount = 1;
+    ret->iops_refcount = 1;
 
     *io = iop;
 
