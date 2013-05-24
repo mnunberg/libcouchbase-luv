@@ -3,8 +3,13 @@ UV_ROOT=/sources/libuv
 CPPFLAGS=-Wall -Wextra -Werror -O0 -ggdb3
 
 all: plugin-libuv.so
+SRC=src/plugin.c \
+	src/util.c \
+	src/socket.c \
+	src/iops.c \
+	src/timer.c
 
-plugin-libuv.so: src/plugin.c src/util.c
+plugin-libuv.so: $(SRC)
 	$(CC) $(CPPFLAGS) \
 		-shared -fPIC \
 		-o $@ \

@@ -1,6 +1,6 @@
-#include "plugin.h"
+#include "plugin-internal.h"
 
-int lcbuv_errno_map(int uverr)
+static int errno_map(int uverr)
 {
 
 #ifndef UNKNOWN
@@ -54,4 +54,45 @@ int lcbuv_errno_map(int uverr)
     return ret;
 
 #undef X
+}
+
+
+my_uvreq_t *lcbuv_alloc_uvreq(my_sockdata_t *sock, void *callback)
+{
+    my_uvreq_t *ret = calloc(1, sizeof(*ret));
+    if (!ret) {
+        sock->base.parent->v.v1.error = ENOMEM;
+        return NULL;
+    }
+    ret->socket = sock;
+    ret->cb.ptr = callback;
+    return ret;
+}
+
+void lcbuv_free_bufinfo_common(struct lcb_buf_info *bi)
+{
+    if (bi->root || bi->ringbuffer) {
+        assert((void*)bi->root != (void*)bi->ringbuffer);
+    }
+    assert( (bi->ringbuffer == NULL && bi->root == NULL) ||
+            (bi->root && bi->ringbuffer));
+
+    free(bi->root);
+    free(bi->ringbuffer);
+    bi->root = NULL;
+    bi->ringbuffer = NULL;
+}
+
+void lcbuv_set_last_error(my_iops_t *io, int error)
+{
+    if (!error) {
+        io->base.v.v1.error = 0;
+        return;
+    }
+    io->base.v.v1.error = errno_map(uv_last_error(io->loop).code);
+}
+
+void lcbuv_generic_close_cb(uv_handle_t *handle)
+{
+    free(handle);
 }

@@ -6,15 +6,7 @@ extern "C" {
 
 #include <libcouchbase/couchbase.h>
 #include <uv.h>
-#include <errno.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
 
-
-int lcbuv_errno_map(int uverr);
 
 /**
  * Use this if using an existing uv_loop_t
