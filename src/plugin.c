@@ -151,14 +151,14 @@ static void close_callback(uv_handle_t *handle)
     decref_iops(&io->base);
 }
 
-static int decref_socket(lcb_io_opt_t iobase, lcb_sockdata_t *sockbase)
+static unsigned int decref_socket(lcb_io_opt_t iobase, lcb_sockdata_t *sockbase)
 {
     dCOMMON_VARS(iobase, sockbase);
-    assert(sockbase->refcount);
-    sockbase->refcount--;
 
-    if (sockbase->refcount) {
-        return 0;
+    assert(sockbase->refcount);
+
+    if (--sockbase->refcount) {
+        return sockbase->refcount;
     }
 
     uv_close((uv_handle_t*)&sock->tcp, close_callback);
@@ -485,7 +485,7 @@ lcb_error_t lcbuv_new_iops(lcb_io_opt_t *io, uv_loop_t *loop)
     iop->version = 1;
 
     iop->v.v1.create_socket = create_socket;
-    iop->v.v1.destroy_socket = decref_socket;
+    iop->v.v1.unref_socket = decref_socket;
 
     iop->v.v1.start_connect = start_connect;
 
