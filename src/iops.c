@@ -7,7 +7,7 @@ void lcbuv_decref_iops(lcb_io_opt_t iobase)
     if (--io->iops_refcount) {
         return;
     }
-    printf("Freeing iops=%p\n", io);
+
     memset(io, 0xff, sizeof(*io));
     free(io);
 }
@@ -32,7 +32,7 @@ static void iops_lcb_dtor(lcb_io_opt_t iobase)
 static void run_event_loop(lcb_io_opt_t iobase)
 {
     my_iops_t *io = (my_iops_t*)iobase;
-    lcbuv_incref_iops(io);
+//    lcbuv_incref_iops(io);
 
     if (!io->external_loop) {
         uv_run(io->loop, UV_RUN_DEFAULT);
@@ -45,7 +45,7 @@ static void stop_event_loop(lcb_io_opt_t iobase)
     if (!io->external_loop) {
         uv_stop(io->loop);
     }
-    lcbuv_decref_iops(iobase);
+//    lcbuv_decref_iops(iobase);
 }
 
 LIBCOUCHBASE_API
