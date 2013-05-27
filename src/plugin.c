@@ -148,21 +148,13 @@ static uv_buf_t alloc_cb(uv_handle_t *handle, size_t suggested_size)
     my_sockdata_t *sock = PTR_FROM_FIELD(my_sockdata_t, handle, tcp);
     struct lcb_buf_info *bi = &sock->base.read_buffer;
 
+    assert(sock->cur_iov == 0);
 
-    assert(sock->cur_iov < 2);
-
-    ret.base = bi->iov[sock->cur_iov].iov_base;
-    ret.len = bi->iov[sock->cur_iov].iov_len;
-
-    if (sock->cur_iov == 1 ||
-            bi->iov[sock->cur_iov+1].iov_len == 0 ||
-            bi->iov[sock->cur_iov+1].iov_base == NULL) {
-
-        sock->read_done = 1;
-    }
+    ret.base = bi->iov[0].iov_base;
+    ret.len = bi->iov[0].iov_len;
 
     sock->cur_iov++;
-
+    sock->read_done = 1;
     (void)suggested_size;
 
     return ret;
@@ -174,9 +166,17 @@ static void read_cb(uv_stream_t *stream, ssize_t nread, uv_buf_t buf)
     lcb_io_read_cb callback = stream->data;
     assert(sock->read_done < 2);
 
-    if (nread > 0 && sock->read_done == 0) {
-        return;
+    /**
+     * UV uses nread == 0 to signal EAGAIN. If the alloc callback hasn't
+     * set read_done (because there's no more buffer space), and UV doesn't
+     * say it's done with reading, we don't do anything here.
+     */
+    if (nread < 1) {
+        sock->read_done = 1;
+    }
 
+    if (!sock->read_done) {
+        return;
     }
 
     sock->read_done++;
@@ -187,6 +187,9 @@ static void read_cb(uv_stream_t *stream, ssize_t nread, uv_buf_t buf)
 
     if (callback) {
         callback(&sock->base, nread);
+
+    }  else{
+        printf("No callback specified!!\n");
     }
 
     lcbuv_decref_sock(sock);
