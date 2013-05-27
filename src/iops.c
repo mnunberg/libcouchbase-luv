@@ -16,11 +16,15 @@ static void iops_lcb_dtor(lcb_io_opt_t iobase)
 {
     my_iops_t *io = (my_iops_t*)iobase;
 
-    unsigned int refcount = io->iops_refcount;
-    lcbuv_decref_iops(iobase);
-    if (refcount > 1 && io->external_loop == 0) {
+    if (io->iops_refcount > 1) {
         uv_run(io->loop, UV_RUN_ONCE);
     }
+
+    if (io->external_loop == 0) {
+        uv_loop_delete(io->loop);
+    }
+
+    lcbuv_decref_iops(iobase);
 }
 
 
@@ -81,7 +85,7 @@ lcb_error_t lcbuv_new_iops(lcb_io_opt_t *io, uv_loop_t *loop)
         ret->external_loop = 1;
 
     } else {
-        loop = uv_default_loop();
+        loop = uv_loop_new();
     }
 
     ret->loop = loop;
