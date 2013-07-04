@@ -1,6 +1,6 @@
-LCB_HEADERS=/sources/libcouchbase/include
-UV_ROOT=/sources/libuv
-CPPFLAGS=-Wall -Wextra -Werror -O0 -ggdb3
+LCB_HEADERS?=/sources/libcouchbase/include
+UV_ROOT?=/sources/libuv
+CPPFLAGS=-Wall -Wextra -Werror -O3 -ggdb3
 
 all: plugin-libuv.so
 SRC=src/plugin.c \
