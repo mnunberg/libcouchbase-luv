@@ -117,7 +117,7 @@ static void socket_closing_cb(uv_idle_t *idle, int status)
 
 unsigned int lcbuv_close_socket(lcb_io_opt_t iobase, lcb_sockdata_t *sockbase)
 {
-    dCOMMON_VARS(iobase, sockbase);
+    dCOMMON_VARS(iobase, sockbase)
     uv_idle_t *idle = calloc(1, sizeof(*idle));
 
     assert(sock->lcb_close_called == 0);

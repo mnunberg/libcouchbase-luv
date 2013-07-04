@@ -23,7 +23,7 @@ static int start_connect(lcb_io_opt_t iobase,
                          unsigned int namelen,
                          lcb_io_connect_cb callback)
 {
-    dCOMMON_VARS(iobase, sockbase);
+    dCOMMON_VARS(iobase, sockbase)
     my_uvreq_t *uvr;
     int ret;
     int err_is_set = 0;
@@ -70,20 +70,26 @@ static int start_connect(lcb_io_opt_t iobase,
  ** my_writebuf_t functions                                                  **
  ******************************************************************************
  ******************************************************************************/
-static lcb_io_writebuf_t *create_writebuf(lcb_io_opt_t iobase)
+static lcb_io_writebuf_t *create_writebuf(lcb_io_opt_t iobase, lcb_sockdata_t *sd)
 {
     my_writebuf_t *ret = calloc(1, sizeof(*ret));
+
     ret->base.parent = iobase;
+
+    (void)sd;
     return (lcb_io_writebuf_t*)ret;
 }
 
-static void release_writebuf(lcb_io_opt_t iobase, lcb_io_writebuf_t *buf)
+static void release_writebuf(lcb_io_opt_t iobase,
+                             lcb_sockdata_t *sd,
+                             lcb_io_writebuf_t *buf)
 {
     lcbuv_free_bufinfo_common(&buf->buffer);
     memset(buf, 0xff, sizeof(my_writebuf_t));
     free(buf);
 
     (void)iobase;
+    (void)sd;
 }
 
 
@@ -111,7 +117,7 @@ static int start_write(lcb_io_opt_t iobase,
                        lcb_io_writebuf_t *wbufbase,
                        lcb_io_write_cb callback)
 {
-    dCOMMON_VARS(iobase, sockbase);
+    dCOMMON_VARS(iobase, sockbase)
     my_writebuf_t *wbuf = (my_writebuf_t*)wbufbase;
     int ii;
     int ret;
@@ -200,7 +206,7 @@ static int start_read(lcb_io_opt_t iobase,
                       lcb_sockdata_t *sockbase,
                       lcb_io_read_cb callback)
 {
-    dCOMMON_VARS(iobase, sockbase);
+    dCOMMON_VARS(iobase, sockbase)
     int ret;
 
     sock->read_done = 0;
@@ -243,7 +249,7 @@ static void err_idle_cb(uv_idle_t *idle, int status)
 static void send_error(lcb_io_opt_t iobase, lcb_sockdata_t *sockbase,
                        lcb_io_error_cb callback)
 {
-    dCOMMON_VARS(iobase, sockbase);
+    dCOMMON_VARS(iobase, sockbase)
     my_uvreq_t *uvr = lcbuv_alloc_uvreq(sock, callback);
 
     if (!uvr) {

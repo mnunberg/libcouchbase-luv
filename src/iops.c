@@ -1,3 +1,4 @@
+#define LIBCOUCHBASE_INTERNAL /** For the symbols */
 #include "plugin-internal.h"
 
 void lcbuv_decref_iops(lcb_io_opt_t iobase)
@@ -37,7 +38,6 @@ static void run_event_loop(lcb_io_opt_t iobase)
 {
     my_iops_t *io = (my_iops_t*)iobase;
 //    lcbuv_incref_iops(io);
-
     if (!io->external_loop) {
         uv_run(io->loop, UV_RUN_DEFAULT);
     }
