@@ -17,9 +17,11 @@ static void iops_lcb_dtor(lcb_io_opt_t iobase)
 {
     my_iops_t *io = (my_iops_t*)iobase;
 
+#ifndef LCBUV_NODEJS
     if (io->iops_refcount > 1) {
         uv_run(io->loop, UV_RUN_ONCE);
     }
+#endif
 
     if (io->external_loop == 0) {
         uv_loop_delete(io->loop);
@@ -36,20 +38,28 @@ static void iops_lcb_dtor(lcb_io_opt_t iobase)
  ******************************************************************************/
 static void run_event_loop(lcb_io_opt_t iobase)
 {
+#ifdef LCBUV_NODEJS
+    (void)iobase;
+    return;
+#else
     my_iops_t *io = (my_iops_t*)iobase;
-//    lcbuv_incref_iops(io);
     if (!io->external_loop) {
         uv_run(io->loop, UV_RUN_DEFAULT);
     }
+#endif
 }
 
 static void stop_event_loop(lcb_io_opt_t iobase)
 {
+#ifdef LCBUV_NODEJS
+    (void)iobase;
+    return;
+#else
     my_iops_t *io = (my_iops_t*)iobase;
     if (!io->external_loop) {
         uv_stop(io->loop);
     }
-//    lcbuv_decref_iops(iobase);
+#endif
 }
 
 LIBCOUCHBASE_API
